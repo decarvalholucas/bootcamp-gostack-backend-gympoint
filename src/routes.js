@@ -1,14 +1,12 @@
 import { Router } from "express";
 
-/** TESTE */
-import User from "./app/models/User";
-/** TESTE */
+// Controllers
+import SessionController from "./app/controllers/SessionController";
+import StudentController from "./app/controllers/StudentController";
 
 const routes = Router();
 
-routes.get("/users", async (req, res) => {
-  const user = await User.findByPk(1);
-  res.json(user);
-});
+routes.post("/sessions", SessionController.store);
+routes.post("/students", StudentController.store);
 
 export default routes;
