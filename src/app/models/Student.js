@@ -17,8 +17,10 @@ class Student extends Model {
     );
 
     this.addHook("beforeSave", student => {
-      const [day, month, year] = student.birthDate.split("/");
-      student.birth_date = `${year}-${month}-${day}`;
+      if (student.birthDate) {
+        const [day, month, year] = student.birthDate.split("/");
+        student.birth_date = `${year}-${month}-${day}`;
+      }
     });
 
     return this;

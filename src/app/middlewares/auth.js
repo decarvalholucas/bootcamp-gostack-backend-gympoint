@@ -1,5 +1,8 @@
+// Import Node Modules
 import jwt from "jsonwebtoken";
 import { promisify } from "util";
+
+// Import application modules
 import authConfig from "../../config/auth";
 
 export default async (req, res, next) => {
@@ -12,11 +15,7 @@ export default async (req, res, next) => {
   const [, token] = authorization.split(" ");
 
   try {
-    const payloadDecoded = await promisify(jwt.verify)(
-      token,
-      authConfig.secret
-    );
-    req.userId = payloadDecoded.id;
+    await promisify(jwt.verify)(token, authConfig.secret);
     return next();
   } catch (error) {
     return res.status(401).json({ error: "Invalid Token" });
