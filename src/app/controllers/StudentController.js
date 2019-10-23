@@ -62,9 +62,7 @@ class StudentController {
       name: Yup.string(),
       email: Yup.string()
         .email()
-        .required(),
-
-      newEmail: Yup.string().email(),
+        .min(1),
       birthDate: Yup.string().matches(dateFormat.dd_mm_yyyy, {
         excludeEmptyString: true
       }),
@@ -76,25 +74,22 @@ class StudentController {
       return res.status(400).json({ error: "Validation fails" });
     }
 
-    const { email, newEmail } = req.body;
-
-    const student = await Student.findOne({ where: { email } });
+    const student = await Student.findByPk(req.params.id);
 
     if (!student) {
       res.status(404).json({ error: "Student not found" });
     }
 
-    if (newEmail && newEmail !== student.email) {
+    if (req.body.email && req.body.email !== student.email) {
       const studentExists = await Student.findOne({
-        where: { email: newEmail }
+        where: { email: req.body.email }
       });
       if (studentExists) {
         return res.status(400).json({ error: "E-mail is already in use" });
       }
-      req.body.email = newEmail;
     }
 
-    const { id, name, birthDate, weight, height } = await student.update(
+    const { id, name, email, birthDate, weight, height } = await student.update(
       req.body
     );
 
