@@ -11,7 +11,7 @@ class StudentController {
     if (!students) {
       return res.status(400).json({ error: "No registered student" });
     }
-    return res.status(200).json(students);
+    return res.json(students);
   }
 
   async store(req, res) {
@@ -47,7 +47,7 @@ class StudentController {
     );
     const [yaear, month, day] = birthDate.split("-");
 
-    return res.status(200).json({
+    return res.json({
       id,
       name,
       email,
@@ -93,7 +93,7 @@ class StudentController {
       req.body
     );
 
-    return res.status(200).json({
+    return res.json({
       id,
       name,
       email,
