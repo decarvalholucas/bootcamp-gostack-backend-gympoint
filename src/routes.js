@@ -1,12 +1,13 @@
 import { Router } from "express";
 
+// Import Middlewares
+import authMiddleware from "./app/middlewares/auth";
+
 // Import Controllers
 import SessionController from "./app/controllers/SessionController";
 import StudentController from "./app/controllers/StudentController";
 import PlanController from "./app/controllers/PlanController";
-
-// Import Middlewares
-import authMiddleware from "./app/middlewares/auth";
+import EnrollmentController from "./app/controllers/EnrollmentController";
 
 const routes = Router();
 
@@ -26,5 +27,8 @@ routes.get("/plans", PlanController.index);
 routes.post("/plans", PlanController.store);
 routes.put("/plans/:id", PlanController.update);
 routes.delete("/plans/:id", PlanController.delete);
+
+// Enrollments routes
+routes.post("/enrollments", EnrollmentController.store);
 
 export default routes;
