@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 
 import Student from "../models/Student";
-import dateFormat from "../../config/dateFormat";
+import dateFormat from "../config/dateFormat";
 
 class StudentController {
   async index(req, res) {

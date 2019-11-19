@@ -4,6 +4,8 @@ import Plan from "../models/Plan";
 import Student from "../models/Student";
 import Enrollment from "../models/Enrollment";
 
+import Mail from "../lib/Mail";
+
 class EnrollmentController {
   async store(req, res) {
     // Data valitation
@@ -77,6 +79,13 @@ class EnrollmentController {
       start_date,
       end_date,
       price
+    });
+
+    // Send mail to new student
+    await Mail.sendMail({
+      to: student.email,
+      subject: "Matricula Criada",
+      text: "Isso é um teste"
     });
 
     return res.json(enrollment);
