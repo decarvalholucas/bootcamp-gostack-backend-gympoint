@@ -1,4 +1,5 @@
-import { parseISO, addDays, subDays, isBefore } from "date-fns";
+import { parseISO, parseJSON, addDays, isBefore, format } from "date-fns";
+import ptbr from "date-fns/locale/pt-BR";
 import * as Yup from "yup";
 import Plan from "../models/Plan";
 import Student from "../models/Student";
@@ -21,36 +22,28 @@ class EnrollmentController {
       start_date: Yup.date().required()
     });
 
-    const [day, month, yaer] = req.body.start_date.split("/");
-    const start_date = parseISO(`${yaer}-${month}-${day}`);
-    const { student_id, plan_id } = req.body;
-
-    if (
-      !(await schema.isValid({
-        start_date,
-        student_id,
-        plan_id
-      }))
-    ) {
+    if (!(await schema.isValid(req.body))) {
       return res.status(400).json({ error: "Validation Fails" });
     }
 
-    // Checks if student exists
-    const student = await Student.findByPk(req.body.student_id);
+    const { student_id, plan_id } = req.body;
+    const start_date = parseISO(req.body.start_date);
 
+    // Checks if student exists
+    const student = await Student.findByPk(student_id);
     if (!student) {
       return res.status(400).json({ error: "Student not found" });
     }
 
     // Checks if plan exists
-    const plan = await Plan.findByPk(req.body.plan_id);
+    const plan = await Plan.findByPk(plan_id);
     if (!plan) {
       return res.status(400).json({ error: "Plan not found" });
     }
 
     // Checks if student has an active enrollment
     const studentAlreadyEnrolled = await Enrollment.findAll({
-      where: { student_id: student.id }
+      where: { student_id }
     });
 
     if (studentAlreadyEnrolled && studentAlreadyEnrolled.length > 0) {
@@ -58,9 +51,7 @@ class EnrollmentController {
     }
 
     // Checks if start_date enrollment date is before today date
-    const dateWithSub = subDays(start_date, 1);
-
-    if (isBefore(dateWithSub, new Date())) {
+    if (isBefore(start_date, new Date())) {
       return res.status(401).json({
         error: "You cannot create an enrollment before today's date."
       });
@@ -84,8 +75,20 @@ class EnrollmentController {
     // Send mail to new student
     await Mail.sendMail({
       to: student.email,
-      subject: "Matricula Criada",
-      text: "Isso é um teste"
+      subject: "Bem vindo ao Gympoint",
+      template: "welcome",
+      context: {
+        student: student.name,
+        enrollment: enrollment.id,
+        start: format(parseJSON(start_date), "dd 'de' MMMM 'de' yyyy", {
+          locale: ptbr
+        }),
+        end: format(parseJSON(end_date), "dd 'de' MMMM 'de' yyyy", {
+          locale: ptbr
+        }),
+        plan: plan.title,
+        price
+      }
     });
 
     return res.json(enrollment);
