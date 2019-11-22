@@ -1,11 +1,11 @@
-import { parseISO, parseJSON, addDays, isBefore, format } from "date-fns";
-import ptbr from "date-fns/locale/pt-BR";
+import { parseISO, addDays, isBefore } from "date-fns";
 import * as Yup from "yup";
 import Plan from "../models/Plan";
 import Student from "../models/Student";
 import Enrollment from "../models/Enrollment";
 
-import Mail from "../lib/Mail";
+import WelcomeMail from "../jobs/WelcomeMail";
+import Queue from "../lib/Queue";
 
 class EnrollmentController {
   async store(req, res) {
@@ -73,22 +73,13 @@ class EnrollmentController {
     });
 
     // Send mail to new student
-    await Mail.sendMail({
-      to: student.email,
-      subject: "Bem vindo ao Gympoint",
-      template: "welcome",
-      context: {
-        student: student.name,
-        enrollment: enrollment.id,
-        start: format(parseJSON(start_date), "dd 'de' MMMM 'de' yyyy", {
-          locale: ptbr
-        }),
-        end: format(parseJSON(end_date), "dd 'de' MMMM 'de' yyyy", {
-          locale: ptbr
-        }),
-        plan: plan.title,
-        price
-      }
+    await Queue.add(WelcomeMail.key, {
+      student,
+      enrollment,
+      start_date,
+      end_date,
+      plan,
+      price
     });
 
     return res.json(enrollment);
