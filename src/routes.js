@@ -8,11 +8,16 @@ import SessionController from "./app/controllers/SessionController";
 import StudentController from "./app/controllers/StudentController";
 import PlanController from "./app/controllers/PlanController";
 import EnrollmentController from "./app/controllers/EnrollmentController";
+import CheckinController from "./app/controllers/CheckinController";
 
 const routes = Router();
 
 // Sessions routes
 routes.post("/sessions", SessionController.store);
+
+// Checkins routes
+routes.get("/students/:studentId/checkins", CheckinController.index);
+routes.post("/students/:studentId/checkins", CheckinController.store);
 
 // authentication required for routes after this middleware
 routes.use(authMiddleware);
