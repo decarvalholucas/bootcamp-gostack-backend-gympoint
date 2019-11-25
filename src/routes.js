@@ -9,6 +9,7 @@ import StudentController from "./app/controllers/StudentController";
 import PlanController from "./app/controllers/PlanController";
 import EnrollmentController from "./app/controllers/EnrollmentController";
 import CheckinController from "./app/controllers/CheckinController";
+import HelpController from "./app/controllers/HelpOrderController";
 
 const routes = Router();
 
@@ -18,6 +19,9 @@ routes.post("/sessions", SessionController.store);
 // Checkins routes
 routes.get("/students/:studentId/checkins", CheckinController.index);
 routes.post("/students/:studentId/checkins", CheckinController.store);
+
+// Help student routes
+routes.post("/students/:studentId/help-orders", HelpController.store);
 
 // authentication required for routes after this middleware
 routes.use(authMiddleware);
@@ -38,5 +42,8 @@ routes.get("/enrollments", EnrollmentController.index);
 routes.post("/enrollments", EnrollmentController.store);
 routes.put("/enrollments/:enrollmentId", EnrollmentController.update);
 routes.delete("/enrollments/:enrollmentId", EnrollmentController.delete);
+
+// Help admins routes
+routes.put("/help-orders/:questionId/answer", HelpController.update);
 
 export default routes;
