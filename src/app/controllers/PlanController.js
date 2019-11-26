@@ -67,8 +67,6 @@ class PlanController {
       res.status(404).json({ error: "Plan not found" });
     }
 
-    console.log(plan.title);
-
     if (req.body.title && req.body.title !== plan.title) {
       const planExists = await Plan.findOne({
         where: { title: req.body.title }

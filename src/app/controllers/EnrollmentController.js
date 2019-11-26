@@ -1,4 +1,4 @@
-import { parseISO, addDays, isBefore } from "date-fns";
+import { parseISO, addDays, isBefore, startOfDay } from "date-fns";
 import * as Yup from "yup";
 import Plan from "../models/Plan";
 import Student from "../models/Student";
@@ -40,7 +40,7 @@ class EnrollmentController {
     }
 
     const { student_email, plan_id } = req.body;
-    const start_date = parseISO(req.body.start_date);
+    const start_date = startOfDay(parseISO(req.body.start_date));
 
     // Checks if student exists
     const student = await Student.findOne({ where: { email: student_email } });
@@ -64,7 +64,7 @@ class EnrollmentController {
     }
 
     // Checks if start_date enrollment date is before today date
-    if (isBefore(start_date, new Date())) {
+    if (isBefore(start_date, startOfDay(new Date()))) {
       return res.status(400).json({
         error: "You cannot create an enrollment before today's date."
       });
@@ -119,7 +119,7 @@ class EnrollmentController {
     }
 
     const { plan_id } = req.body;
-    const start_date = parseISO(req.body.start_date);
+    const start_date = startOfDay(parseISO(req.body.start_date));
 
     // Checks if plan exists
     const plan = await Plan.findByPk(plan_id);
@@ -127,13 +127,8 @@ class EnrollmentController {
       return res.status(404).json({ error: "Plan not found" });
     }
 
-    // Check if plan already match student plan
-    if (plan_id === enrollment.plan_id) {
-      return res.status(400).json({ error: "Plan already match student plan" });
-    }
-
     // Checks if start_date enrollment date is before today date
-    if (isBefore(start_date, new Date())) {
+    if (isBefore(start_date, startOfDay(new Date()))) {
       return res.status(400).json({
         error: "You cannot create an enrollment before today's date."
       });

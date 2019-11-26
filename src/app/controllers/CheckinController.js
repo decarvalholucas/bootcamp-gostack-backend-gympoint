@@ -1,4 +1,4 @@
-import { addDays, isAfter, startOfDay, endOfDay, subDays } from "date-fns";
+import { isAfter, startOfDay, endOfDay, subDays } from "date-fns";
 import * as Yup from "yup";
 import Checkin from "../schemas/Checkin";
 import Student from "../models/Student";
@@ -56,7 +56,6 @@ class CheckinController {
     }
 
     // Checks if the student has already checked in 5 times
-
     const busyDays = subDays(today, 7);
 
     const checkin = await Checkin.find({ student_id })
@@ -66,8 +65,7 @@ class CheckinController {
 
     if (checkin >= 5) {
       return res.status(400).json({
-        error: `Limit exceeded, You can only do 5 check-ins every 7 days. 
-        Next checkin avaliable in ${addDays(today, 1)}`
+        error: "Limit exceeded, You can only do 5 check-ins every 7 days."
       });
     }
 

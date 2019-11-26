@@ -6,7 +6,7 @@ import dateFormat from "../config/dateFormat";
 class StudentController {
   async index(req, res) {
     const students = await Student.findAll({
-      attributes: ["name", "email", "birth_date", "weight", "height"]
+      attributes: ["id", "name", "email", "birth_date", "weight", "height"]
     });
     if (!students) {
       return res.status(400).json({ error: "No registered student" });

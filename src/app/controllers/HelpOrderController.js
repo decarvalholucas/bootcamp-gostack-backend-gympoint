@@ -5,6 +5,21 @@ import Queue from "../lib/Queue";
 import AnswerMail from "../jobs/AnswerMail";
 
 class HelpController {
+  async index(req, res) {
+    const helps = await Help.findAll({
+      where: { answer: null },
+      attributes: ["id", "question", "answer", "answer_at"],
+      include: [
+        {
+          model: Student,
+          as: "student",
+          attributes: ["id", "name", "email"]
+        }
+      ]
+    });
+    return res.json(helps);
+  }
+
   async store(req, res) {
     const dataValidate = Yup.object().shape({
       studentId: Yup.number()
@@ -52,15 +67,15 @@ class HelpController {
     }
 
     if (help.answer !== null) {
-      return res.status(400).json({ error: "This question already answered" });
+      return res
+        .status(400)
+        .json({ error: "This question has already been answered." });
     }
 
     await help.update({
       answer: req.body.answer,
       answer_at: new Date()
     });
-
-    // Send mail to student with answer response
 
     const student = await Student.findByPk(help.student_id);
 
