@@ -1,6 +1,8 @@
 import * as Yup from "yup";
 import Student from "../models/Student";
 import Help from "../models/HelpOrder";
+import Queue from "../lib/Queue";
+import AnswerMail from "../jobs/AnswerMail";
 
 class HelpController {
   async store(req, res) {
@@ -49,9 +51,23 @@ class HelpController {
       return res.status(404).json({ error: "Question not found" });
     }
 
+    if (help.answer !== null) {
+      return res.status(400).json({ error: "This question already answered" });
+    }
+
     await help.update({
       answer: req.body.answer,
       answer_at: new Date()
+    });
+
+    // Send mail to student with answer response
+
+    const student = await Student.findByPk(help.student_id);
+
+    await Queue.add(AnswerMail.key, {
+      student,
+      question: help.question,
+      answer: help.answer
     });
 
     return res.json(help);
