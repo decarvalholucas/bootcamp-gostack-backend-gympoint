@@ -17,7 +17,7 @@ module.exports = {
         unique: true
       },
       birth_date: {
-        type: Sequelize.DATEONLY,
+        type: Sequelize.DATE,
         allowNull: false
       },
       weight: {

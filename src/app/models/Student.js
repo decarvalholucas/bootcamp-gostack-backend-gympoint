@@ -6,8 +6,7 @@ class Student extends Model {
       {
         name: Sequelize.STRING,
         email: Sequelize.STRING,
-        birthDate: Sequelize.VIRTUAL,
-        birth_date: Sequelize.DATEONLY,
+        birth_date: Sequelize.DATE,
         weight: Sequelize.DECIMAL,
         height: Sequelize.DECIMAL
       },
@@ -15,13 +14,6 @@ class Student extends Model {
         sequelize: connection
       }
     );
-
-    this.addHook("beforeSave", student => {
-      if (student.birthDate) {
-        const [day, month, year] = student.birthDate.split("/");
-        student.birth_date = `${year}-${month}-${day}`;
-      }
-    });
 
     return this;
   }

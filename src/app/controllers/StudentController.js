@@ -1,7 +1,7 @@
 import * as Yup from "yup";
 
+import { parseISO } from "date-fns";
 import Student from "../models/Student";
-import dateFormat from "../config/dateFormat";
 
 class StudentController {
   async index(req, res) {
@@ -20,9 +20,7 @@ class StudentController {
       email: Yup.string()
         .required()
         .email(),
-      birthDate: Yup.string()
-        .matches(dateFormat.dd_mm_yyyy, { excludeEmptyString: true })
-        .required(),
+      birth_date: Yup.date().required(),
       weight: Yup.number()
         .positive()
         .required(),
@@ -42,19 +40,13 @@ class StudentController {
       return res.status(400).json({ error: "Student already exists" });
     }
 
-    const { id, name, birthDate, weight, height } = await Student.create(
+    req.body.birth_date = parseISO(req.body.birth_date);
+
+    const { id, name, birth_date, weight, height } = await Student.create(
       req.body
     );
-    const [yaear, month, day] = birthDate.split("-");
 
-    return res.json({
-      id,
-      name,
-      email,
-      birthDate: `${day}/${month}/${yaear}`,
-      weight,
-      height
-    });
+    return res.json({ id, name, email, birth_date, weight, height });
   }
 
   async update(req, res) {
@@ -63,9 +55,7 @@ class StudentController {
       email: Yup.string()
         .email()
         .min(1),
-      birthDate: Yup.string().matches(dateFormat.dd_mm_yyyy, {
-        excludeEmptyString: true
-      }),
+      birth_date: Yup.date(),
       weight: Yup.number().positive(),
       height: Yup.number().positive()
     });
@@ -89,18 +79,19 @@ class StudentController {
       }
     }
 
-    const { id, name, email, birthDate, weight, height } = await student.update(
-      req.body
-    );
+    if (req.body.birth_date)
+      req.body.birth_date = parseISO(req.body.birth_date);
 
-    return res.json({
+    const {
       id,
       name,
       email,
-      birthDate,
+      birth_date,
       weight,
       height
-    });
+    } = await student.update(req.body);
+
+    return res.json({ id, name, email, birth_date, weight, height });
   }
 }
 
